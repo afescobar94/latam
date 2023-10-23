@@ -2,9 +2,11 @@ import pandas as pd
 from datetime import datetime
 from typing import Tuple, Union, List
 import numpy as np
-
+import os
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
+from joblib import dump, load
+
 from sklearn.metrics import confusion_matrix, classification_report
 
 class DelayModel:
@@ -108,10 +110,11 @@ class DelayModel:
         ], axis=1)
 
         if target_column:
-            target = data[target_column]
-            return features, target
+            target = pd.DataFrame(data[target_column])
 
-        return features
+            return features[self.top_10_features], target
+
+        return features[self.top_10_features]
 
     def fit(
         self,
@@ -127,8 +130,8 @@ class DelayModel:
         """
 
         x_train, x_test, y_train, y_test = train_test_split(
-            features[self.top_10_features],
-            target,
+            features,
+            target['delay'],
             test_size=0.33,
             random_state=42,
             shuffle=True
@@ -142,7 +145,13 @@ class DelayModel:
         self._model = LogisticRegression(
             class_weight={1: n_y0 / len(y_train), 0: n_y1 / len(y_train)}
         )
-        self._model.fit(x_train, y_train)
+        self._model.fit(x_train, y_train.values.ravel())
+
+        result = self._model.predict(x_test)
+        print(confusion_matrix(y_test, result))
+
+        dump(self._model, 'logistic_regression_model.joblib')
+
 
     def predict(
         self,
@@ -157,6 +166,12 @@ class DelayModel:
         Returns:
             (List[int]): predicted targets.
         """
+        if self._model is None:
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            print(current_dir)
+            data_path = os.path.join(current_dir, 'logistic_regression_model.joblib')
+            self._model = load(data_path)
+
         x_to_predict = features[self.top_10_features]
         predictions = self._model.predict(x_to_predict)
 
