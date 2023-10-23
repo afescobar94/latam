@@ -144,9 +144,6 @@ class DelayModel:
         )
         self._model.fit(x_train, y_train)
 
-        reg_y_preds = self._model.predict(x_test)
-        print(confusion_matrix(y_test, reg_y_preds))
-
     def predict(
         self,
         features: pd.DataFrame
@@ -160,4 +157,7 @@ class DelayModel:
         Returns:
             (List[int]): predicted targets.
         """
-        return
+        x_to_predict = features[self.top_10_features]
+        predictions = self._model.predict(x_to_predict)
+
+        return predictions.tolist()
