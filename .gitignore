@@ -1,1 +1,11 @@
 *.idea
+.coverage
+challenge/.ipynb_checkpoints/Untitled-checkpoint.ipynb
+challenge/Untitled.ipynb
+challenge/__pycache__/
+challenge/reports/
+logistic_regression_model.joblib
+reports/
+tests/__pycache__/
+tests/model/__pycache__/
+tests/model/logistic_regression_model.joblib
