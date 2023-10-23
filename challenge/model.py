@@ -3,12 +3,28 @@ from datetime import datetime
 from typing import Tuple, Union, List
 import numpy as np
 
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix, classification_report
+
 class DelayModel:
 
     def __init__(
         self
     ):
         self._model = None # Model should be saved in this attribute.
+        self.top_10_features = [
+            "OPERA_Latin American Wings",
+            "MES_7",
+            "MES_10",
+            "OPERA_Grupo LATAM",
+            "MES_12",
+            "TIPOVUELO_I",
+            "MES_4",
+            "MES_11",
+            "OPERA_Sky Airline",
+            "OPERA_Copa Air"
+        ]
 
     @staticmethod
     def _get_period_day(date: str) -> str:
@@ -55,11 +71,10 @@ class DelayModel:
 
     @staticmethod
     def _get_min_diff(row: pd.Series) -> float:
-        def get_min_diff(data):
-            fecha_o = datetime.strptime(data['Fecha-O'], '%Y-%m-%d %H:%M:%S')
-            fecha_i = datetime.strptime(data['Fecha-I'], '%Y-%m-%d %H:%M:%S')
-            min_diff = ((fecha_o - fecha_i).total_seconds()) / 60
-            return min_diff
+        fecha_o = datetime.strptime(row['Fecha-O'], '%Y-%m-%d %H:%M:%S')
+        fecha_i = datetime.strptime(row['Fecha-I'], '%Y-%m-%d %H:%M:%S')
+        min_diff = ((fecha_o - fecha_i).total_seconds()) / 60
+        return min_diff
 
     def preprocess(
         self,
@@ -110,7 +125,27 @@ class DelayModel:
             features (pd.DataFrame): preprocessed data.
             target (pd.DataFrame): target.
         """
-        return
+
+        x_train, x_test, y_train, y_test = train_test_split(
+            features[self.top_10_features],
+            target,
+            test_size=0.33,
+            random_state=42,
+            shuffle=True
+        )
+
+        # Get weights for the classes
+        n_y0 = len(y_train[y_train == 0])
+        n_y1 = len(y_train[y_train == 1])
+
+        # Train logistic regression model
+        self._model = LogisticRegression(
+            class_weight={1: n_y0 / len(y_train), 0: n_y1 / len(y_train)}
+        )
+        self._model.fit(x_train, y_train)
+
+        reg_y_preds = self._model.predict(x_test)
+        print(confusion_matrix(y_test, reg_y_preds))
 
     def predict(
         self,
