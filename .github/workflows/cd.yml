@@ -1,14 +1,15 @@
 name: Continuous Delivery
 
 on:
-  push:
-    branches:
-#      - main
-      - ci-cd-test-branch
+  workflow_run:
+    workflows: ["Continuous Integration"]  # El nombre del flujo de trabajo de CI
+    types:
+      - completed
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
     - name: Download CI success artifact
       uses: actions/download-artifact@v2
