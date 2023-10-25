@@ -3,7 +3,7 @@ name: Continuous Integration
 on:
   push:
     branches:
-#      - main
+      - main
       - ci-cd-test-branch
 
 jobs:
@@ -12,15 +12,5 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-
     - name: Run tests
       run: echo "Tests passed successfully!"
-
-    - name: Create CI success artifact
-      run: touch ci-success.txt
-
-    - name: Upload CI success artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: ci-artifact
-        path: ci-success.txt
