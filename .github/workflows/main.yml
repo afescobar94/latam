@@ -1,0 +1,35 @@
+name: CI/CD Workflow
+
+on:
+  push:
+    branches:
+      -cd-test-branch
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Run tests
+      run: |
+        npm install
+        npm test
+
+  deploy:
+    needs: build_and_test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Deploy to EC2
+      env:
+        PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+        HOST: ${{ secrets.ec2-44-219-138-190.compute-1.amazonaws.com }}
+        USER: ${{ secrets.ec2-user }}
+      run: |
+        echo "$PRIVATE_KEY" > private_key.pem
+        chmod 600 private_key.pem
+        rsync -avz -e "ssh -i private_key.pem -o StrictHostKeyChecking=no" --exclude '.git/' ./ $USER@$HOST:/home/ec2-user/latam
+        ssh -i private_key.pem -o StrictHostKeyChecking=no $USER@$HOST "cd /home/ec2-user/latam && sudo reboot"
