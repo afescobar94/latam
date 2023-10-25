@@ -3,7 +3,7 @@ name: CI/CD Workflow
 on:
   push:
     branches:
-      - cd-test-branch
+      - ci-cd-test-branch
 
 jobs:
   build_and_test:
