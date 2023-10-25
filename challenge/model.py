@@ -95,11 +95,9 @@ class DelayModel:
             or
             pd.DataFrame: features.
         """
-
         data['period_day'] = data['Fecha-I'].apply(self._get_period_day)
         data['high_season'] = data['Fecha-I'].apply(self._is_high_season)
         data['min_diff'] = data.apply(self._get_min_diff, axis=1)
-
         threshold_in_minutes = 15
         data['delay'] = np.where(data['min_diff'] > threshold_in_minutes, 1, 0)
 
@@ -113,6 +111,11 @@ class DelayModel:
             target = pd.DataFrame(data[target_column])
 
             return features[self.top_10_features], target
+
+        for col in self.top_10_features:
+            if col not in features.columns:
+                features[col] = 0
+        features = features[self.top_10_features]
 
         return features[self.top_10_features]
 
@@ -168,7 +171,6 @@ class DelayModel:
         """
         if self._model is None:
             current_dir = os.path.dirname(os.path.abspath(__file__))
-            print(current_dir)
             data_path = os.path.join(current_dir, 'logistic_regression_model.joblib')
             self._model = load(data_path)
 

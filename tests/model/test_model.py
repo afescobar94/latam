@@ -32,7 +32,7 @@ class TestModel(unittest.TestCase):
         current_dir = os.path.dirname(os.path.abspath(__file__))
         data_path = os.path.join(current_dir, '..', '..', 'data', 'data.csv')
         self.data = pd.read_csv(filepath_or_buffer=data_path)
-        
+
 
     def test_model_preprocess_for_training(
         self
@@ -41,7 +41,7 @@ class TestModel(unittest.TestCase):
             data=self.data,
             target_column="delay"
         )
-
+        print(self.data)
         assert isinstance(features, pd.DataFrame)
         assert features.shape[1] == len(self.FEATURES_COLS)
         assert set(features.columns) == set(self.FEATURES_COLS)

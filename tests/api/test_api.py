@@ -19,6 +19,8 @@ class TestBatchPipeline(unittest.TestCase):
             ]
         }
         # when("xgboost.XGBClassifier").predict(ANY).thenReturn(np.array([0])) # change this line to the model of chosing
+
+        print(data)
         response = self.client.post("/predict", json=data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"predict": [0]})
