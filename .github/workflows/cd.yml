@@ -1,10 +1,10 @@
 name: Continuous Delivery
 
 on:
-  push:
-    branches:
-#      - main
-      - ci-cd-test-branch
+  workflow_run:
+    workflows: ["Continuous Integration"]
+    types:
+      - completed
 
 jobs:
   deploy:
