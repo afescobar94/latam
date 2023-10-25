@@ -1,27 +1,19 @@
-name: CI/CD Workflow
+name: Continuous Delivery
 
 on:
-  push:
-    branches:
-      - main
-      - ci-cd-test-branch
+  workflow_run:
+    workflows: ["Continuous Integration"]
+    types:
+      - completed
 
 jobs:
-  build_and_test:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Run tests
-      run: echo "Tests passed successfully!"
-
   deploy:
-    needs: build_and_test
+    if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+
     - name: Deploy to EC2
       env:
         PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
