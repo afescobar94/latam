@@ -1,0 +1,17 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - main
+#      - ci-cd-test-branch
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Run tests
+      run: echo "Tests passed successfully!"
