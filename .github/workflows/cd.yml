@@ -1,27 +1,23 @@
-name: CI/CD Workflow
+name: Continuous Delivery
 
 on:
   push:
     branches:
-      - main
+#      - main
       - ci-cd-test-branch
 
 jobs:
-  build_and_test:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Run tests
-      run: echo "Tests passed successfully!"
-
   deploy:
-    needs: build_and_test
     runs-on: ubuntu-latest
     steps:
+    - name: Download CI success artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: ci-artifact
+
     - name: Checkout code
       uses: actions/checkout@v2
+
     - name: Deploy to EC2
       env:
         PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
