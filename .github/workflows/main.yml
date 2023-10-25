@@ -29,6 +29,6 @@ jobs:
       run: |
         echo "$PRIVATE_KEY" > private_key.pem
         chmod 600 private_key.pem
-        ssh -v -i private_key.pem -o StrictHostKeyChecking=no $USER@$HOST "echo Connected successfully"
+        ssh -v -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "echo Connected successfully"
         rsync -avz -e "ssh -i private_key.pem -o StrictHostKeyChecking=no" --exclude '.git/' ./ $USER@$HOST:/home/ec2-user/latam
         ssh -i private_key.pem -o StrictHostKeyChecking=no $USER@$HOST "cd /home/ec2-user/latam && sudo reboot"
