@@ -1,10 +1,9 @@
-from fastapi import FastAPI, HTTPException, Depends, Body
+from fastapi import FastAPI, HTTPException
 import sys
 import os
 import pandas as pd
 from typing import List
 from typing import Union
-from flask import Flask, request, jsonify
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 data_path = os.path.join(current_dir)
